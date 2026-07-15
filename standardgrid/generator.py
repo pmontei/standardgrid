@@ -22,10 +22,21 @@ class GridGenerator:
     reference grid.
     """
 
-    def __init__(self, standard: GridStandard, resolution: float) -> None:
+    def __init__(
+        self,
+        standard: GridStandard,
+        resolution: float,
+    ) -> None:
+
         self._standard = standard
         self._resolution = resolution
         self._origin = standard.origin
+
+        # Metadata generated with the grid
+        self._bounds = None
+        self._nrows = None
+        self._ncols = None
+        self._npoints = None
 
     @property
     def standard(self) -> GridStandard:
@@ -34,8 +45,43 @@ class GridGenerator:
     @property
     def resolution(self) -> float:
         return self._resolution
+        
+    @property
+    def bounds(self):
+        """
+        Bounding box aligned to the reference grid.
+        """
+        return self._bounds
 
-    def generate(self, bbox: Tuple[float, float, float, float]) -> pd.DataFrame:
+
+    @property
+    def nrows(self) -> int:
+        """
+        Number of grid rows.
+        """
+        return self._nrows
+
+
+    @property
+    def ncols(self) -> int:
+        """
+        Number of grid columns.
+        """
+        return self._ncols
+
+
+    @property
+    def npoints(self) -> int:
+        """
+        Number of generated centroids.
+        """
+        return self._npoints
+
+
+    def generate(
+        self,
+        bbox: Tuple[float, float, float, float],
+    ) -> pd.DataFrame:
         """
         Generate centroid coordinates inside a bounding box.
 
@@ -49,12 +95,39 @@ class GridGenerator:
         pandas.DataFrame
             DataFrame with x and y coordinates.
         """
+
         xmin, ymin, xmax, ymax = self._snap_bbox(bbox)
 
-        xs = self._generate_axis(xmin, xmax, self._origin[0])
-        ys = self._generate_axis(ymin, ymax, self._origin[1])
+        xs = self._generate_axis(
+            xmin,
+            xmax,
+            self._origin[0],
+        )
 
-        return self._build_dataframe(xs, ys)
+        ys = self._generate_axis(
+            ymin,
+            ymax,
+            self._origin[1],
+        )
+
+        df = self._build_dataframe(
+            xs,
+            ys,
+        )
+
+        # Store metadata
+        self._bounds = (
+            xmin,
+            ymin,
+            xmax,
+            ymax,
+        )
+
+        self._nrows = len(ys)
+        self._ncols = len(xs)
+        self._npoints = len(df)
+
+        return df
 
     # ------------------------------------------------------------------
     # Snapping helpers

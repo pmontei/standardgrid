@@ -6,7 +6,7 @@ The project follows semantic versioning.
 
 ---
 
-## [0.5.0] - 2026-07-14
+## [0.6.0] - 2026-07-15
 
 ### Added
 
