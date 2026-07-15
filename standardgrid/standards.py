@@ -137,3 +137,11 @@ def available_standards() -> tuple[str, ...]:
     """
 
     return tuple(sorted(_STANDARDS.keys()))
+
+
+def standards() -> tuple[GridStandard, ...]:
+    """
+    Return all supported grid standards.
+    """
+
+    return tuple(_STANDARDS.values())

@@ -20,19 +20,37 @@ class Grid:
     Public interface for generating standards-aligned reference grids.
     """
 
-    def __init__(self, standard: str, resolution: float) -> None:
+    def __init__(
+        self,
+        standard: str,
+        resolution: float,
+    ) -> None:
+
         self._standard = get_standard(standard)
+
+        if resolution not in self._standard.resolutions:
+
+            supported = "\n".join(
+                f"  • {r}"
+                for r in self._standard.resolutions
+            )
+
+            raise ValueError(
+                f"Resolution {resolution} is not supported for "
+                f"{self._standard.name}.\n\n"
+                f"Supported resolutions are:\n"
+                f"{supported}"
+            )
+
         self._resolution = resolution
 
         self._bbox = None
         self._points = None
 
-        self._bounds = None
-        self._nrows = None
-        self._ncols = None
-        self._npoints = None
-
-        self._generator = GridGenerator(self._standard, resolution)
+        self._generator = GridGenerator(
+            self._standard,
+            resolution,
+        )
 
     # ------------------------------------------------------------------
     # Properties

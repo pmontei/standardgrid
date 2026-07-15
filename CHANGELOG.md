@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-The project follows semantic versioning.
+This project follows Semantic Versioning (SemVer).
 
 ---
 
@@ -10,12 +10,20 @@ The project follows semantic versioning.
 
 ### Added
 
-- Initial implementation of the library.
+- Initial public release.
 - Support for official C-Squares reference grids.
 - Support for official INSPIRE reference grids.
-- GridGenerator core engine.
-- Public Grid API.
-- Automatic grid alignment to the selected standard.
-- Grid centroid generation.
-- Unit tests for GridGenerator.
-- Unit tests for Grid.
+- `GridGenerator` core engine.
+- Public `Grid` API.
+- Automatic alignment of bounding boxes to the selected grid standard.
+- Generation of grid centroid coordinates.
+- Grid metadata:
+  - Bounds
+  - Number of rows
+  - Number of columns
+  - Number of points
+- Export to CSV.
+- Export to Microsoft Excel (`.xlsx`).
+- Unit tests for `GridGenerator`.
+- Unit tests for `Grid`.
+- Unit tests for export functions.
