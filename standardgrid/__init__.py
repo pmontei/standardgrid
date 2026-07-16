@@ -10,13 +10,15 @@ from .standards import (
     GridStandard,
     get_standard,
     available_standards,
+    standards,
 )
 
-__version__ = "0.6.0"
+__version__ = "1.0.0"
 
 __all__ = [
     "Grid",
     "GridStandard",
     "get_standard",
     "available_standards",
+    "standards",
 ]

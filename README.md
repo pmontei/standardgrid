@@ -1,13 +1,105 @@
 # StandardGrid
 
-**StandardGrid** is a lightweight Python library for generating official spatial reference grids aligned with recognised standards such as **C-Squares** and **INSPIRE**.
+**StandardGrid** is a lightweight Python library for generating **standards-compliant spatial reference grids** aligned with recognised reference systems such as **C-Squares** and **INSPIRE**.
 
-The library was developed within the **EMODnet Seabed Habitats** project to support the harmonisation and automation of composite habitat map production carried out under **Work Package 3 (WP3)**. Its primary objective is to provide a reproducible and standardised way of generating reference grids for large-scale spatial analyses and map compilation.
+The library was originally developed within the **EMODnet Seabed Habitats** project to support the harmonisation and automation of composite habitat map production carried out under **Work Package 3 (WP3)**. Its primary objective is to provide a reproducible and standardised way of generating reference grids for large-scale spatial analyses and map compilation.
 
-Although initially developed for EMODnet Seabed Habitats, StandardGrid is intended as a general-purpose library for any application requiring standardised spatial reference grids.
+Although initially developed for EMODnet Seabed Habitats, StandardGrid is intended as a general-purpose library for any GIS application requiring official and reproducible spatial reference grids.
 
 ---
-## Supported resolutions
+
+## Why StandardGrid?
+
+Combining spatial datasets from different sources is often challenging because they are produced using different grid origins, spatial resolutions or processing workflows.
+
+StandardGrid addresses this problem by generating centroid grids that are precisely aligned with recognised spatial reference standards, ensuring that different datasets can be integrated consistently and reproducibly.
+
+Typical applications include:
+
+* Essential Fish Habitats (EFH)
+* Vulnerable Marine Ecosystems (VME)
+* Essential Ocean Variables (EOV)
+* Habitat suitability modelling
+* Marine spatial planning
+* Environmental assessments
+* Large-scale composite habitat mapping
+* Any workflow requiring standards-aligned reference grids
+
+---
+
+## Features
+
+* Official C-Squares support
+* Official INSPIRE support
+* Automatic alignment to official reference grids
+* Validation of supported resolutions
+* Standards-compliant centroid generation
+* Pandas DataFrame output
+* CSV export
+* Excel export
+* Simple and lightweight Python API
+
+---
+
+## Installation
+
+Install directly from PyPI:
+
+```bash
+pip install standardgrid
+```
+
+or install from the GitHub repository:
+
+```bash
+git clone https://github.com/pmontei/standardgrid.git
+
+cd standardgrid
+
+pip install .
+```
+
+---
+
+## Quick Start
+
+```python
+from standardgrid import Grid
+
+grid = Grid(
+    standard="csquares",
+    resolution=0.01,
+)
+
+grid.generate(
+    (-10.1, 36.6, -7.3, 41.9)
+)
+
+print(grid.points.head())
+
+grid.to_csv("grid.csv")
+```
+
+---
+
+## Supported Standards
+
+StandardGrid currently supports the following official spatial reference systems.
+
+| Standard     | CRS       | Units   |
+| ------------ | --------- | ------- |
+| C-Squares    | EPSG:4326 | Degrees |
+| INSPIRE Grid | EPSG:3035 | Metres  |
+
+Additional standards may be incorporated in future releases.
+
+---
+
+## Supported Resolutions
+
+Each supported standard defines a fixed set of official grid resolutions.
+
+StandardGrid validates the requested resolution automatically to ensure compliance with the selected standard.
 
 | Standard  | Resolution | Description            |
 | --------- | ---------: | ---------------------- |
@@ -22,115 +114,80 @@ Although initially developed for EMODnet Seabed Habitats, StandardGrid is intend
 | INSPIRE   |    10000 m | 10 km                  |
 | INSPIRE   |     1000 m | 1 km                   |
 | INSPIRE   |      100 m | 100 m                  |
+| INSPIRE   |       10 m | 10 m                   |
+| INSPIRE   |        1 m | 1 m                    |
 
-You can also query the supported resolutions directly from the API:
-
-            from standardgrid import get_standard
-
-            csquares = get_standard("csquares")
-
-            print(csquares.resolutions)
-
-            print(csquares.name)
-            print(csquares.crs)
-            print(csquares.units)
-            print(csquares.resolutions)
-
-## Why StandardGrid?
-
-Combining habitat maps from different sources is often challenging because datasets are produced using different spatial resolutions, grid origins or processing workflows.
-
-StandardGrid addresses this problem by generating grids that are precisely aligned with official spatial reference systems, ensuring that different datasets can be integrated consistently and reproducibly.
-
-Typical applications include:
-
-- Essential Fish Habitats (EFH)
-- Vulnerable Marine Ecosystems (VME)
-- Essential Ocean Variables (EOV)
-- Habitat suitability modelling
-- Marine spatial planning
-- Environmental assessments
-- Other harmonised marine habitat products
+Attempting to use an unsupported resolution raises a `ValueError`.
 
 ---
 
-## Features
+## Discover Available Standards
 
-- Official C-Squares support
-- Official INSPIRE support
-- Automatic alignment to official reference grids
-- Grid centroid generation
-- Pandas DataFrame output
-- CSV export
-- Excel export
-- Simple and lightweight Python API
-
----
-
-## Installation
-
-```bash
-pip install standardgrid
-```
-
-or
-
-```bash
-git clone https://github.com/pmontei/standardgrid.git
-```
-
----
-
-## Example
+The supported standards and their properties can be queried directly from the API.
 
 ```python
-from standardgrid import Grid
+from standardgrid import available_standards, get_standard
 
-grid = Grid(
-    standard="csquares",
-    resolution=0.01,
-)
+for code in available_standards():
 
-grid.generate(
-    (-10.1, 36.6, -7.3, 41.9)
-)
+    standard = get_standard(code)
 
-print(grid.points)
+    print(standard.name)
+    print(standard.crs)
+    print(standard.units)
+    print(standard.resolutions)
+```
 
-grid.to_csv("grid.csv")
+Example output:
+
+```text
+C-Squares
+EPSG:4326
+degrees
+(10.0, 5.0, 1.0, 0.5, 0.1, 0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001, 0.00005, 0.00001)
+
+INSPIRE
+EPSG:3035
+metres
+(100000.0, 10000.0, 1000.0, 100.0, 10.0, 1.0)
 ```
 
 ---
 
-## Supported standards
+## Project Background
 
-Currently supported:
+StandardGrid was originally developed within the **EMODnet Seabed Habitats** project to support the harmonisation and automation of composite habitat mapping workflows developed under **Work Package 3 (WP3)**.
 
-- C-Squares
-- INSPIRE Grid
+The library was initially designed to facilitate the production of harmonised pan-European spatial products, including:
 
-Additional reference grids may be added in future releases.
+* Essential Fish Habitats (EFH)
+* Vulnerable Marine Ecosystems (VME)
+* Essential Ocean Variables (EOV)
+
+By ensuring that all datasets share exactly the same spatial reference grid, StandardGrid simplifies rasterisation, spatial overlay, data aggregation and reproducible GIS workflows.
+
+Although originally developed for marine habitat mapping, the library is applicable to any GIS workflow requiring official standards-aligned reference grids.
 
 ---
 
-## Acknowledgements
+## Citation
 
-StandardGrid was developed within the **EMODnet Seabed Habitats** project.
-
-The initial motivation for the library was the harmonisation and automation of composite habitat map production under **Work Package 3**, including products such as:
-
-- Essential Fish Habitats (EFH)
-- Vulnerable Marine Ecosystems (VME)
-- Essential Ocean Variables (EOV)
-
-EMODnet Seabed Habitats is funded by the European Union.
+If StandardGrid contributes to your work, please cite the project and acknowledge the **EMODnet Seabed Habitats** initiative where appropriate.
 
 ---
 
 ## License
 
-This project is released under the MIT License.
+This project is released under the **MIT License**.
 
+---
 
-Developed by: Pedro Monteiro, CCMAR – University of Algarve
-Project: EMODnet Seabed Habitats
+**Developed by**
+
+Pedro Monteiro
+CCMAR – Centre of Marine Sciences
+University of Algarve
+
+**Project**
+
+EMODnet Seabed Habitats
