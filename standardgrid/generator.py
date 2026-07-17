@@ -95,7 +95,7 @@ class GridGenerator:
         pandas.DataFrame
             DataFrame with x and y coordinates.
         """
-
+        self._validate_bbox(bbox)
         xmin, ymin, xmax, ymax = self._snap_bbox(bbox)
 
         xs = self._generate_axis(
@@ -168,6 +168,37 @@ class GridGenerator:
         ymax = self._snap_up(ymax, self._origin[1])
 
         return xmin, ymin, xmax, ymax
+
+  # ------------------------------------------------------------------
+    # validate_bbox
+    # ------------------------------------------------------------------
+    def _validate_bbox(
+        self,
+        bbox: Tuple[float, float, float, float],
+    ) -> None:
+        """
+        Validate that the bounding box appears to be expressed
+        in the coordinate reference system of the selected standard.
+        """
+
+        xmin, ymin, xmax, ymax = bbox
+
+        if self.standard.code == "inspire":
+
+            if max(
+                abs(xmin),
+                abs(ymin),
+                abs(xmax),
+                abs(ymax),
+            ) < 100000:
+
+                raise ValueError(
+                    "The bounding box does not appear to be expressed "
+                    "in EPSG:3035 (metres)."
+                )
+
+
+
 
     # ------------------------------------------------------------------
     # Axis generation

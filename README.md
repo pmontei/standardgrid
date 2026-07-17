@@ -93,6 +93,24 @@ StandardGrid currently supports the following official spatial reference systems
 
 Additional standards may be incorporated in future releases.
 
+
+## API identifiers
+
+Standards are selected in the API using their **identifier** (`code`), while documentation uses their official name.
+
+| API identifier | Official name |
+|----------------|---------------|
+| `csquares`     | C-Squares     |
+| `inspire`      | INSPIRE       |
+
+Example:
+
+```python
+grid = Grid(
+    standard="csquares",
+    resolution=0.01,
+)
+
 ---
 
 ## Supported Resolutions

@@ -18,6 +18,12 @@ from .standards import get_standard
 class Grid:
     """
     Public interface for generating standards-aligned reference grids.
+    
+    Parameters
+    ----------
+    standard
+        API identifier of the grid standard
+        (e.g. "csquares", "inspire").
     """
 
     def __init__(

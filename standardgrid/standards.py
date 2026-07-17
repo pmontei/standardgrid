@@ -32,6 +32,26 @@ from typing import Dict, Tuple
 class GridStandard:
     """
     Immutable definition of a spatial reference grid standard.
+
+    Attributes
+    ----------
+    name
+        Official human-readable name.
+
+    code
+        Stable identifier used by the StandardGrid API.
+
+    crs
+        Coordinate Reference System of the standard.
+
+    origin
+        Origin of the reference grid.
+
+    units
+        Coordinate units used by the standard.
+
+    resolutions
+        Supported grid resolutions.
     """
 
     name: str
@@ -41,7 +61,7 @@ class GridStandard:
     units: str
     resolutions: Tuple[float, ...]
 
-
+    
 # ---------------------------------------------------------------------
 # C-Squares
 # ---------------------------------------------------------------------
@@ -108,7 +128,10 @@ def get_standard(code: str) -> GridStandard:
     Parameters
     ----------
     code : str
-        Standard identifier (case insensitive).
+    API identifier of the standard
+    (e.g. "csquares", "inspire").
+
+    Comparison is case insensitive.
 
     Returns
     -------
