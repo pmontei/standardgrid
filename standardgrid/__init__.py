@@ -1,7 +1,7 @@
 """
 standardgrid
 
-A Python library for generating official spatial reference grids.
+Generate official standards-aligned spatial reference grids.
 """
 
 from .grid import Grid
@@ -13,7 +13,7 @@ from .standards import (
     standards,
 )
 
-__version__ = "1.0.0"
+from .version import __version__
 
 __all__ = [
     "Grid",

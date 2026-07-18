@@ -4,7 +4,7 @@
 
 The library was originally developed within the **EMODnet Seabed Habitats** project to support the harmonisation and automation of composite habitat map production carried out under **Work Package 3 (WP3)**. Its primary objective is to provide a reproducible and standardised way of generating reference grids for large-scale spatial analyses and map compilation.
 
-Although initially developed for EMODnet Seabed Habitats, StandardGrid is intended as a general-purpose library for any GIS application requiring official and reproducible spatial reference grids.
+Although originally developed for EMODnet Seabed Habitats, StandardGrid is intended as a general-purpose Python library for any GIS application requiring official and reproducible spatial reference grids.
 
 ---
 
@@ -31,13 +31,13 @@ Typical applications include:
 
 * Official C-Squares support
 * Official INSPIRE support
+* Standards-compliant centroid generation
 * Automatic alignment to official reference grids
 * Validation of supported resolutions
-* Standards-compliant centroid generation
+* Simple and lightweight Python API
 * Pandas DataFrame output
 * CSV export
 * Excel export
-* Simple and lightweight Python API
 
 ---
 
@@ -75,12 +75,36 @@ grid.generate(
     (-10.1, 36.6, -7.3, 41.9)
 )
 
+print(grid)
+
 print(grid.points.head())
 
 grid.to_csv("grid.csv")
+
+The generated grid is available as a pandas DataFrame through `grid.points`.
+
 ```
 
 ---
+
+## Public API
+
+StandardGrid exposes a compact and stable public API.
+
+Most users will only need the `Grid` class to generate standards-aligned reference grids.
+
+```python
+from standardgrid import (
+    Grid,
+    GridStandard,
+    available_standards,
+    get_standard,
+    standards,
+)
+```
+
+The remaining functions provide access to metadata describing the supported spatial reference standards.
+
 
 ## Supported Standards
 
@@ -89,7 +113,7 @@ StandardGrid currently supports the following official spatial reference systems
 | Standard     | CRS       | Units   |
 | ------------ | --------- | ------- |
 | C-Squares    | EPSG:4326 | Degrees |
-| INSPIRE Grid | EPSG:3035 | Metres  |
+| INSPIRE      | EPSG:3035 | Metres  |
 
 Additional standards may be incorporated in future releases.
 
@@ -110,6 +134,7 @@ grid = Grid(
     standard="csquares",
     resolution=0.01,
 )
+```
 
 ---
 
@@ -117,7 +142,8 @@ grid = Grid(
 
 Each supported standard defines a fixed set of official grid resolutions.
 
-StandardGrid validates the requested resolution automatically to ensure compliance with the selected standard.
+The requested resolution is validated automatically during grid creation.
+
 
 | Standard  | Resolution | Description            |
 | --------- | ---------: | ---------------------- |
@@ -139,7 +165,7 @@ Attempting to use an unsupported resolution raises a `ValueError`.
 
 ---
 
-## Discover Available Standards
+## Working with Standards
 
 The supported standards and their properties can be queried directly from the API.
 
@@ -155,8 +181,17 @@ for code in available_standards():
     print(standard.units)
     print(standard.resolutions)
 ```
+Alternatively, all supported standards can be accessed directly:
 
-Example output:
+```python
+from standardgrid import standards
+
+for standard in standards():
+    print(f"{standard.name} ({standard.code})")
+```
+
+Output:
+
 
 ```text
 C-Squares
@@ -190,7 +225,7 @@ Although originally developed for marine habitat mapping, the library is applica
 
 ## Citation
 
-If StandardGrid contributes to your work, please cite the project and acknowledge the **EMODnet Seabed Habitats** initiative where appropriate.
+If StandardGrid contributes to published research or technical reports, please cite the project and acknowledge the EMODnet Seabed Habitats initiative where appropriate.
 
 ---
 

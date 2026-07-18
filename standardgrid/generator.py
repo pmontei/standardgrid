@@ -80,8 +80,10 @@ class GridGenerator:
 
     def generate(
         self,
-        bbox: Tuple[float, float, float, float],
+        bbox: tuple[float, float, float, float],
+        bbox_crs: str | None = None,
     ) -> pd.DataFrame:
+        
         """
         Generate centroid coordinates inside a bounding box.
 
@@ -90,11 +92,18 @@ class GridGenerator:
         bbox : tuple
             (xmin, ymin, xmax, ymax)
 
+        bbox_crs : str, optional
+        Coordinate Reference System (CRS) of the
+        bounding box (e.g. "EPSG:4326").
+        If provided, it must match the CRS of the
+        selected grid standard.
         Returns
         -------
         pandas.DataFrame
             DataFrame with x and y coordinates.
         """
+        
+        self._validate_bbox_crs(bbox_crs)
         self._validate_bbox(bbox)
         xmin, ymin, xmax, ymax = self._snap_bbox(bbox)
 
@@ -130,9 +139,85 @@ class GridGenerator:
         return df
 
     # ------------------------------------------------------------------
+    # validate_bbox_CRS
+    # ------------------------------------------------------------------
+    def _validate_bbox_crs(
+        self,
+        bbox_crs: str | None,
+    ) -> None:
+        """
+        Validate that the supplied bounding box CRS matches the
+        selected grid standard.
+
+        Parameters
+        ----------
+        bbox_crs : str or None
+            Coordinate Reference System of the bounding box.
+            If None, no validation is performed.
+        """
+
+        if bbox_crs is None:
+            return
+
+        if bbox_crs.upper() != self.standard.crs.upper():
+
+            raise ValueError(
+                f"Bounding box CRS ({bbox_crs}) does not match the "
+                f"selected grid standard ({self.standard.crs}). "
+                f"Please provide the bounding box in "
+                f"{self.standard.crs}."
+            )
+
+
+    # ------------------------------------------------------------------
+    # validate_bbox
+    # ------------------------------------------------------------------
+    def _validate_bbox(
+        self,
+        bbox: tuple[float, float, float, float],
+    ) -> None:
+        """
+        Validate the bounding box coordinates.
+        """
+
+        xmin, ymin, xmax, ymax = bbox
+
+        # Bounding box geometry
+        if xmin >= xmax:
+            raise ValueError(
+                "Bounding box is invalid: xmin must be smaller than xmax."
+            )
+
+        if ymin >= ymax:
+            raise ValueError(
+                "Bounding box is invalid: ymin must be smaller than ymax."
+            )
+
+        # Standard-specific extent
+        extent = self.standard.extent
+
+        if extent is None:
+            return
+
+        xmin_valid, ymin_valid, xmax_valid, ymax_valid = extent
+
+        if (
+            xmin < xmin_valid
+            or xmax > xmax_valid
+            or ymin < ymin_valid
+            or ymax > ymax_valid
+        ):
+            raise ValueError(
+                f"Bounding box is outside the valid extent of "
+                f"{self.standard.name} ({self.standard.crs})."
+            )
+
+
+
+
+    # ------------------------------------------------------------------
     # Snapping helpers
     # ------------------------------------------------------------------
-
     def _snap_down(self, value: float, origin: float) -> float:
         return (
             math.floor((value - origin) / self._resolution)
@@ -152,8 +237,8 @@ class GridGenerator:
 
     def _snap_bbox(
         self,
-        bbox: Tuple[float, float, float, float],
-    ) -> Tuple[float, float, float, float]:
+        bbox: tuple[float, float, float, float],
+    ) -> tuple[float, float, float, float]:
 
         xmin, ymin, xmax, ymax = bbox
 
@@ -169,37 +254,7 @@ class GridGenerator:
 
         return xmin, ymin, xmax, ymax
 
-  # ------------------------------------------------------------------
-    # validate_bbox
-    # ------------------------------------------------------------------
-    def _validate_bbox(
-        self,
-        bbox: Tuple[float, float, float, float],
-    ) -> None:
-        """
-        Validate that the bounding box appears to be expressed
-        in the coordinate reference system of the selected standard.
-        """
-
-        xmin, ymin, xmax, ymax = bbox
-
-        if self.standard.code == "inspire":
-
-            if max(
-                abs(xmin),
-                abs(ymin),
-                abs(xmax),
-                abs(ymax),
-            ) < 100000:
-
-                raise ValueError(
-                    "The bounding box does not appear to be expressed "
-                    "in EPSG:3035 (metres)."
-                )
-
-
-
-
+  
     # ------------------------------------------------------------------
     # Axis generation
     # ------------------------------------------------------------------

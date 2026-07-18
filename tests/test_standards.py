@@ -8,9 +8,13 @@ for code in available_standards():
     standard = get_standard(code)
 
     print(f"\n{standard.name}")
+    print(f"Code: {standard.code}")
     print(f"CRS: {standard.crs}")
     print(f"Units: {standard.units}")
+    print(f"Origin: {standard.origin}")
+    print(f"Valid extent: {standard.extent}")
+
     print("Supported resolutions:")
 
-    for r in standard.resolutions:
-        print(f"  {r}")
+    for resolution in standard.resolutions:
+        print(f"  {resolution}")

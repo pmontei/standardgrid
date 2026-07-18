@@ -1,29 +1,33 @@
-"""
-standardgrid.grid
-=================
-
-Public API for generating standards-aligned reference grids.
-"""
-
 from __future__ import annotations
-
-from typing import Tuple
 
 import pandas as pd
 
 from .generator import GridGenerator
-from .standards import get_standard
+from .standards import GridStandard, get_standard
 
 
 class Grid:
+   
+
     """
-    Public interface for generating standards-aligned reference grids.
-    
+    standardgrid.grid
+    =================
+
+    Public interface for generating standards-aligned
+    reference grids.
+
     Parameters
     ----------
-    standard
+    standard : str
         API identifier of the grid standard
         (e.g. "csquares", "inspire").
+
+    resolution : float
+        Grid resolution expressed in the units of the
+        selected standard.
+
+        The resolution must be one of the supported
+        resolutions for that standard.
     """
 
     def __init__(
@@ -52,6 +56,11 @@ class Grid:
 
         self._bbox = None
         self._points = None
+        
+        self._bounds = None
+        self._nrows = None
+        self._ncols = None
+        self._npoints = None
 
         self._generator = GridGenerator(
             self._standard,
@@ -63,19 +72,19 @@ class Grid:
     # ------------------------------------------------------------------
 
     @property
-    def standard(self):
+    def standard(self) -> GridStandard:
         return self._standard
 
     @property
-    def resolution(self):
+    def resolution(self) -> float:
         return self._resolution
 
     @property
-    def bbox(self):
+    def bbox(self) -> tuple[float, float, float, float] | None:
         return self._bbox
 
     @property
-    def bounds(self):
+    def bounds(self) -> tuple[float, float, float, float] | None:
         return self._bounds
 
     @property
@@ -95,7 +104,7 @@ class Grid:
         return self._npoints
 
     @property
-    def shape(self):
+    def shape(self) -> tuple[int, int] | None:
         if self._nrows is None:
             return None
         return (self._nrows, self._ncols)
@@ -104,9 +113,37 @@ class Grid:
     # Public methods
     # ------------------------------------------------------------------
 
-    def generate(self, bbox: tuple[float, float, float, float]) -> "Grid":
+    def generate(
+        self,
+        bbox: tuple[float, float, float, float],
+        bbox_crs: str | None = None,
+    ) -> "Grid":
+        """
+        Generate a reference grid within a bounding box.
+
+        Parameters
+        ----------
+        bbox : tuple
+            Bounding box expressed as
+            (xmin, ymin, xmax, ymax).
+
+        bbox_crs : str, optional
+            Coordinate Reference System (CRS) of the
+            bounding box (e.g. "EPSG:4326").
+            If provided, it must match the CRS of the
+            selected grid standard.
+
+        Returns
+        -------
+        Grid
+            The generated grid instance.
+        """
+
         self._bbox = bbox
-        self._points = self._generator.generate(bbox)
+        self._points = self._generator.generate(
+            bbox,
+            bbox_crs=bbox_crs,
+        )
 
         self._bounds = self._generator.bounds
         self._nrows = self._generator.nrows

@@ -2,22 +2,23 @@
 standardgrid.standards
 ======================
 
-Definitions of supported official spatial reference grid standards.
+Definitions of the official spatial reference grid standards supported
+by StandardGrid.
 
 Each standard defines:
 
 - Official name
-- Internal code
+- Stable API identifier
 - Coordinate Reference System (CRS)
 - Grid origin
 - Coordinate units
 - Supported grid resolutions
 
-These definitions are immutable and used throughout the library.
+The definitions are immutable and are used throughout the library.
 
 Author
 ------
-Pedro Monteiro & OpenAI
+Pedro Monteiro
 
 License
 -------
@@ -25,7 +26,6 @@ MIT
 """
 
 from dataclasses import dataclass
-from typing import Dict, Tuple
 
 
 @dataclass(frozen=True)
@@ -57,11 +57,12 @@ class GridStandard:
     name: str
     code: str
     crs: str
-    origin: Tuple[float, float]
+    origin: tuple[float, float]
     units: str
-    resolutions: Tuple[float, ...]
+    resolutions: tuple[float, ...]
+    extent: tuple[float, float, float, float] | None
 
-    
+
 # ---------------------------------------------------------------------
 # C-Squares
 # ---------------------------------------------------------------------
@@ -87,8 +88,13 @@ CSQUARES = GridStandard(
         0.00005,
         0.00001,
     ),
+    extent=(
+        -180.0,
+        -90.0,
+        180.0,
+        90.0,
+    ),
 )
-
 
 # ---------------------------------------------------------------------
 # INSPIRE
@@ -108,6 +114,7 @@ INSPIRE = GridStandard(
         10.0,
         1.0,
     ),
+    extent=None,
 )
 
 
@@ -115,7 +122,8 @@ INSPIRE = GridStandard(
 # Registry
 # ---------------------------------------------------------------------
 
-_STANDARDS: Dict[str, GridStandard] = {
+#: Registry of supported grid standards.
+_STANDARDS: dict[str, GridStandard] = {
     CSQUARES.code: CSQUARES,
     INSPIRE.code: INSPIRE,
 }
@@ -123,19 +131,20 @@ _STANDARDS: Dict[str, GridStandard] = {
 
 def get_standard(code: str) -> GridStandard:
     """
-    Return a grid standard from its code.
+    Return a grid standard from its API identifier.
 
     Parameters
     ----------
     code : str
-    API identifier of the standard
-    (e.g. "csquares", "inspire").
+        API identifier of the standard
+        (e.g. "csquares", "inspire").
 
-    Comparison is case insensitive.
+        Comparison is case insensitive.
 
     Returns
     -------
     GridStandard
+        The requested grid standard.
 
     Raises
     ------
@@ -156,7 +165,7 @@ def get_standard(code: str) -> GridStandard:
 
 def available_standards() -> tuple[str, ...]:
     """
-    Return the identifiers of all supported standards.
+    Return the API identifiers of all supported grid standards.
     """
 
     return tuple(sorted(_STANDARDS.keys()))
@@ -168,3 +177,6 @@ def standards() -> tuple[GridStandard, ...]:
     """
 
     return tuple(_STANDARDS.values())
+
+
+

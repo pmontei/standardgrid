@@ -2,6 +2,7 @@ from standardgrid import Grid
 
 
 def test_constructor():
+
     grid = Grid(
         standard="csquares",
         resolution=0.01,
@@ -14,6 +15,7 @@ def test_constructor():
 
 
 def test_generate():
+
     grid = Grid(
         standard="csquares",
         resolution=0.01,
@@ -44,13 +46,6 @@ def test_generate():
 
     assert len(grid.points) == 70
 
-    print(grid.points.head())
-    print()
-    print("Primeiro x:", repr(grid.points.iloc[0]["x"]))
-    print("Primeiro y:", repr(grid.points.iloc[0]["y"]))
-    print("Último x:", repr(grid.points.iloc[-1]["x"]))
-    print("Último y:", repr(grid.points.iloc[-1]["y"]))
-
     assert grid.points.iloc[0]["x"] == 10.235
     assert grid.points.iloc[0]["y"] == 35.005
 
@@ -58,9 +53,59 @@ def test_generate():
     assert grid.points.iloc[-1]["y"] == 35.095
 
 
+def test_bbox_crs_matches():
+
+    grid = Grid(
+        standard="csquares",
+        resolution=0.01,
+    )
+
+    grid.generate(
+        (
+            10.231,
+            35.004,
+            10.298,
+            35.091,
+        ),
+        bbox_crs="EPSG:4326",
+    )
+
+    assert grid.points is not None
+
+
+def test_bbox_crs_mismatch():
+
+    grid = Grid(
+        standard="inspire",
+        resolution=1000,
+    )
+
+    try:
+
+        grid.generate(
+            (
+                10.231,
+                35.004,
+                10.298,
+                35.091,
+            ),
+            bbox_crs="EPSG:4326",
+        )
+
+        assert False, "Expected ValueError."
+
+    except ValueError:
+
+        pass
+
+
 if __name__ == "__main__":
 
     test_constructor()
     test_generate()
+    test_bbox_crs_matches()
+    test_bbox_crs_mismatch()
 
     print("All tests passed.")
+
+    
